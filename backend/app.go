@@ -1,15 +1,15 @@
 package main
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/jinzhu/gorm"
 )
 
 type App struct {
 	Router *mux.Router
-	DB    *sql.DB
+	DB     *gorm.DB
 }
 
 func (a *App) Initialize(username, password, dbname, dbtype string) {
