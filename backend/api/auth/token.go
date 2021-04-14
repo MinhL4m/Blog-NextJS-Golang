@@ -52,7 +52,7 @@ func TokenValid(r *http.Request) error {
 func ExtractTokenID(r *http.Request) (uint32, error) {
 
 	tokenString := ExtractToken(r)
-	
+
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
@@ -67,6 +67,7 @@ func ExtractTokenID(r *http.Request) (uint32, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 
 	if ok && token.Valid {
+		// Take uid out of set of claims
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
 		if err != nil {
 			return 0, err
