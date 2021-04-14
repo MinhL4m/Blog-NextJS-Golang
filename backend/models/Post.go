@@ -50,7 +50,7 @@ func (p *Post) SavePost(db *gorm.DB) (*Post, error) {
 	}
 	if p.ID != 0 {
 		// Get Author
-		err = db.Debug().Model(&User{}).Where("id = ?", p.AuthorID).Take(&p.Author).Error
+		err = db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", p.AuthorID).Take(&p.Author).Error
 		if err != nil {
 			return &Post{}, err
 		}
@@ -71,13 +71,33 @@ func (p *Post) FindAllPosts(db *gorm.DB, limit, skip uint8) (*[]Post, error) {
 	}
 	if len(posts) > 0 {
 		for i, _ := range posts {
-			err := db.Debug().Model(&User{}).Where("id = ?", posts[i].AuthorID).Take(&posts[i].Author).Error
+			err := db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", posts[i].AuthorID).Take(&posts[i].Author).Error
 			if err != nil {
 				return &[]Post{}, err
 			}
 		}
 	}
 	return &posts, nil
+}
+
+func (p *Post) FindPostById(db *gorm.DB, pid uint32) (*Post, error) {
+	err := db.Debug().Where("id = ?", pid).Take(&p).Error
+
+	if err != nil {
+		return &Post{}, err
+	}
+
+	if gorm.IsRecordNotFoundError(err) {
+		return &Post{}, errors.New("User Not Found")
+	}
+	if p.ID != 0 {
+		// Get Author
+		err = db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", p.AuthorID).Take(&p.Author).Error
+		if err != nil {
+			return &Post{}, err
+		}
+	}
+	return p, nil
 }
 
 func (p *Post) FindPostByTitle(db *gorm.DB, title string, limit, skip uint8) (*[]Post, error) {
@@ -107,7 +127,7 @@ func (p *Post) FindPostByTitle(db *gorm.DB, title string, limit, skip uint8) (*[
 
 	if len(posts) > 0 {
 		for i, _ := range posts {
-			err := db.Debug().Model(&User{}).Where("id = ?", posts[i].AuthorID).Take(&posts[i].Author).Error
+			err := db.Debug().Model(&User{}).Select("ID", "Name", "Email").Select("ID", "Name", "Email").Where("id = ?", posts[i].AuthorID).Take(&posts[i].Author).Error
 			if err != nil {
 				return &[]Post{}, err
 			}
@@ -124,7 +144,7 @@ func (p *Post) UpdatePost(db *gorm.DB) (*Post, error) {
 	}
 
 	if p.ID != 0 {
-		err = db.Debug().Model(&User{}).Where("id = ?", p.AuthorID).Take(&p.Author).Error
+		err = db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", p.AuthorID).Take(&p.Author).Error
 		if err != nil {
 			return &Post{}, err
 		}
