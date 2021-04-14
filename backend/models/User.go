@@ -73,7 +73,7 @@ func (u *User) UpdateUser(db *gorm.DB, uid uint32) (*User, error) {
 		return &User{}, db.Error
 	}
 
-	err := db.Debug().Model(&User{}).Where("id = ?", uid).Take(&u).Error
+	err := db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", uid).Take(&u).Error
 
 	if err != nil {
 		return &User{}, db.Error
@@ -99,7 +99,7 @@ func (u *User) UpdateUserPassword(db *gorm.DB, uid uint32) (*User, error) {
 		return &User{}, db.Error
 	}
 	// This is the display the updated user
-	err = db.Debug().Model(&User{}).Where("id = ?", uid).Take(&u).Error
+	err = db.Debug().Model(&User{}).Select("ID", "Name", "Email").Where("id = ?", uid).Take(&u).Error
 	if err != nil {
 		return &User{}, err
 	}
